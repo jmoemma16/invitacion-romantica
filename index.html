@@ -1,28 +1,42 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Una invitación para ti 💌</title>
 <style>
 :root{--pink:#ff5c8a;--dark:#5b2440;--soft:#ffe0e9}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,sans-serif;color:var(--dark);background:linear-gradient(145deg,#fff,#ffedf2,#ffd6e2);overflow-x:hidden}
 main{position:relative;width:min(680px,92%);margin:28px auto;padding-bottom:35px}.card{background:#ffffffdf;border:1px solid white;border-radius:26px;box-shadow:0 18px 55px #a92e5c1c;padding:clamp(20px,5vw,40px);text-align:center}
 h1{font-size:clamp(2rem,7vw,3rem);line-height:1.1}h2{margin-bottom:10px}.emoji{font-size:4rem;margin:12px}p{line-height:1.6;color:#81556a}.badge{display:inline-block;padding:7px 13px;background:var(--soft);border-radius:99px}
-.buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}button{border:0;border-radius:13px;padding:13px 19px;font:inherit;font-weight:700;cursor:pointer;transition:.2s}button:hover{transform:translateY(-2px)}.primary{background:var(--pink);color:white}.secondary{background:#fff0f4;color:var(--dark);border:1px solid #ffd0df}.hidden{display:none!important}
+.buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px;min-height:48px}button{border:0;border-radius:13px;padding:13px 19px;font:inherit;font-weight:700;cursor:pointer;transition:transform .2s, left .18s, top .18s}button:hover{transform:translateY(-2px)}.primary{background:var(--pink);color:white;box-shadow:0 7px 18px #ff5c8a40}.secondary{background:#fff0f4;color:var(--dark);border:1px solid #ffd0df}.hidden{display:none!important}
 .progress{display:flex;gap:6px;margin:0 auto 22px;max-width:330px}.progress span{height:5px;flex:1;border-radius:99px;background:#f5d5e0}.progress span.active{background:var(--pink)}
 .field{text-align:left;margin:15px 0}label{display:block;font-weight:700;margin-bottom:7px}input,textarea{width:100%;padding:12px;border:1px solid #edc8d5;border-radius:11px;font:inherit}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:18px 0}.choice{background:#fff7fa;border:2px solid #f6dce5;min-height:95px;color:var(--dark)}.choice span{display:block;font-size:2rem}.choice.selected{border-color:var(--pink);background:#ffe7ef}.summary{background:#fff5f8;border-radius:15px;padding:15px;text-align:left;margin:18px 0}.summary p{margin:7px 0}.note,footer{font-size:.85rem;color:#9d6e82}.heart{position:fixed;bottom:-30px;pointer-events:none;animation:float 9s linear infinite;opacity:.35}@keyframes float{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}.confetti{position:fixed;top:-20px;animation:fall 3s linear forwards;pointer-events:none}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.7}}footer{text-align:center;padding:15px}
+/* Tarjeta/carta animada */
+.letter-wrap{perspective:1000px;margin:22px auto;max-width:360px;min-height:220px;cursor:pointer}
+.envelope{position:relative;height:210px;background:#ffb5ca;border-radius:12px;box-shadow:0 12px 25px #a92e5c22;overflow:hidden}
+.envelope:before{content:"";position:absolute;inset:0;background:#ffc8d8;clip-path:polygon(0 0,50% 58%,100% 0);z-index:3;transition:transform .8s;transform-origin:top}
+.envelope:after{content:"";position:absolute;inset:0;background:#ff8fb0;clip-path:polygon(0 100%,50% 48%,100% 100%);z-index:2}
+.letter{position:absolute;left:7%;right:7%;bottom:8px;height:175px;padding:18px 12px;background:#fffafc;border-radius:9px;z-index:1;transition:transform .8s;box-shadow:0 2px 10px #6e24451a}
+.letter .emoji{font-size:2rem;margin:0}.letter p{margin:5px;font-size:.95rem}
+.letter-wrap.open .envelope:before{transform:rotateX(180deg);z-index:0}
+.letter-wrap.open .letter{transform:translateY(-90px);z-index:4}
+.seal{position:absolute;z-index:5;left:calc(50% - 22px);top:83px;width:44px;height:44px;border-radius:50%;background:#ff5c8a;color:white;display:grid;place-items:center;font-size:22px;transition:opacity .3s}
+.letter-wrap.open .seal{opacity:0}
+#noBtn{position:relative;touch-action:manipulation}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
-</head>
-<body>
+</head><body>
 <main><div class="card">
 <div class="progress" id="progress"><span class="active"></span><span></span><span></span><span></span></div>
 <section class="step" id="step1">
 <div class="badge">📩 Tienes un mensajito</div><div class="emoji">💌</div>
-<h1>Tengo una pregunta para ti...</h1><p>He estado pensando en alguien especial y esa persona eres tú. 🥹</p>
-<h2>¿Quieres salir conmigo? 💖</h2>
-<div class="buttons"><button class="primary" onclick="go(2)">¡SÍ, CLARO! 💕</button><button class="secondary" onclick="nope()">No 😅</button></div><p id="noMessage" class="note"></p>
+<h1>Una carta para ti...</h1><p>Hay algo que quiero preguntarte. Primero, abre esta cartita. 🥹</p>
+<div class="letter-wrap" id="letterWrap" role="button" tabindex="0" aria-label="Abrir la carta">
+<div class="envelope"><div class="letter"><div class="emoji">💖</div><p><b>Para alguien muy especial</b></p><p>Me encantaría pasar un ratito contigo...</p><p>¿Aceptas mi invitación? 💌</p></div><div class="seal">♥</div></div>
+</div><p class="note">Toca la carta para abrirla 💌</p>
+<h2>¿Quieres salir conmigo? 💕</h2>
+<div class="buttons" id="choiceButtons"><button class="primary" id="yesBtn">¡SÍ, CLARO! 💗</button><button class="secondary" id="noBtn">No 😅</button></div><p id="noMessage" class="note" aria-live="polite"></p>
 </section>
 <section class="step hidden" id="step2"><div class="emoji">🥰</div><h2>¡Qué emoción!</h2><p>Vamos a organizar nuestra cita.</p>
 <div class="field"><label for="person">¿Cómo te llamas? (opcional)</label><input id="person" maxlength="60" placeholder="Tu nombre"></div>
@@ -32,12 +46,7 @@ h1{font-size:clamp(2rem,7vw,3rem);line-height:1.1}h2{margin-bottom:10px}.emoji{f
 <div class="buttons"><button class="secondary" onclick="go(1)">← Regresar</button><button class="primary" onclick="saveDate()">Continuar 💗</button></div></section>
 <section class="step hidden" id="step3"><div class="emoji">🍓</div><h2>Elige el antojo</h2><p>¿Qué te gustaría comer?</p>
 <div class="grid">
-<button class="choice" data-food="Pizza" onclick="pick(this)"><span>🍕</span>Pizza</button>
-<button class="choice" data-food="Tacos" onclick="pick(this)"><span>🌮</span>Tacos</button>
-<button class="choice" data-food="Hamburguesas" onclick="pick(this)"><span>🍔</span>Hamburguesas</button>
-<button class="choice" data-food="Sushi" onclick="pick(this)"><span>🍣</span>Sushi</button>
-<button class="choice" data-food="Helado" onclick="pick(this)"><span>🍦</span>Helado</button>
-<button class="choice" data-food="Sorpresa" onclick="pick(this)"><span>💝</span>Sorpresa</button></div>
+<button class="choice" data-food="Pizza" onclick="pick(this)"><span>🍕</span>Pizza</button><button class="choice" data-food="Tacos" onclick="pick(this)"><span>🌮</span>Tacos</button><button class="choice" data-food="Hamburguesas" onclick="pick(this)"><span>🍔</span>Hamburguesas</button><button class="choice" data-food="Sushi" onclick="pick(this)"><span>🍣</span>Sushi</button><button class="choice" data-food="Helado" onclick="pick(this)"><span>🍦</span>Helado</button><button class="choice" data-food="Sorpresa" onclick="pick(this)"><span>💝</span>Sorpresa</button></div>
 <div class="field"><label for="extra">¿Algo más que te gustaría hacer?</label><textarea id="extra" rows="2" placeholder="Ej. caminar, ver una película..."></textarea></div>
 <div class="buttons"><button class="secondary" onclick="go(2)">← Regresar</button><button class="primary" onclick="showSummary()">Ver invitación ✨</button></div></section>
 <section class="step hidden" id="step4"><div class="emoji">💞</div><h1>¡Tenemos una cita!</h1><p>¡Qué emoción! Esta es nuestra pequeña aventura.</p><div id="summary" class="summary"></div><p>Lo importante es pasar un rato bonito juntos. ❤️</p>
@@ -47,16 +56,20 @@ h1{font-size:clamp(2rem,7vw,3rem);line-height:1.1}h2{margin-bottom:10px}.emoji{f
 let food="";const $=id=>document.getElementById(id);
 const now=new Date();$("date").min=new Date(now-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
 for(let i=0;i<18;i++){let h=document.createElement("span");h.className="heart";h.textContent=["💗","💕","💖","♡"][i%4];h.style.left=Math.random()*100+"%";h.style.animationDelay=Math.random()*8+"s";h.style.animationDuration=7+Math.random()*7+"s";h.style.fontSize=16+Math.random()*24+"px";document.body.appendChild(h)}
-function go(n){document.querySelectorAll(".step").forEach(s=>s.classList.add("hidden"));$("step"+n).classList.remove("hidden");[...$("progress").children].forEach((p,i)=>p.classList.toggle("active",i<n));window.scrollTo({top:0,behavior:"smooth"})}
-function nope(){$("noMessage").textContent=["¿Segur@? 🥺","Piénsalo otra vez 🙈","Te invito un helado 🍦","Está bien, puedes decir que no 💗"][Math.floor(Math.random()*4)]}
+$("letterWrap").addEventListener("click",()=> $("letterWrap").classList.toggle("open"));
+$("letterWrap").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();$("letterWrap").classList.toggle("open")}});
+$("yesBtn").addEventListener("click",()=>go(2));
+const no=$("noBtn");
+function runAway(e){if(e)e.preventDefault();const box=$("choiceButtons"),r=box.getBoundingClientRect(),w=no.offsetWidth,h=no.offsetHeight;no.style.position="fixed";no.style.zIndex="20";const maxX=Math.max(8,window.innerWidth-w-8),maxY=Math.max(8,window.innerHeight-h-8);let x=Math.random()*maxX,y=Math.random()*maxY;no.style.left=x+"px";no.style.top=y+"px";$("noMessage").textContent=["¡Uy, casi! 😂","Ese botón es tímido 🙈","¿Intentándolo otra vez? 😹","¡Atrápame si puedes! 💨"][Math.floor(Math.random()*4)]}
+no.addEventListener("pointerenter",runAway);no.addEventListener("pointerdown",runAway);no.addEventListener("click",runAway);
+function go(n){no.style.position="";no.style.left="";no.style.top="";document.querySelectorAll(".step").forEach(s=>s.classList.add("hidden"));$("step"+n).classList.remove("hidden");[...$("progress").children].forEach((p,i)=>p.classList.toggle("active",i<n));window.scrollTo({top:0,behavior:"smooth"})}
 function saveDate(){if(!$("date").value){alert("Elige una fecha para la cita 😊");return}if($("date").value<$("date").min){alert("Elige una fecha de hoy en adelante.");return}go(3)}
 function pick(b){food=b.dataset.food;document.querySelectorAll(".choice").forEach(x=>x.classList.toggle("selected",x===b))}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function getPlan(){let d=$("date").value;return {person:$("person").value.trim()||"Persona especial",date:d?new Date(d+"T12:00:00").toLocaleDateString("es-MX",{weekday:"long",year:"numeric",month:"long",day:"numeric"}):"Por acordar",time:$("time").value||"Por acordar",place:$("place").value.trim()||"Por elegir",food:food||"Por elegir",extra:$("extra").value.trim()||"Nada más por ahora"}}
-function showSummary(){let p=getPlan();$("summary").innerHTML=`<p>💌 <b>Para:</b> ${esc(p.person)}</p><p>📅 <b>Fecha:</b> ${esc(p.date)}</p><p>🕒 <b>Hora:</b> ${esc(p.time)}</p><p>📍 <b>Lugar:</b> ${esc(p.place)}</p><p>🍕 <b>Comida:</b> ${esc(p.food)}</p><p>✨ <b>Plan extra:</b> ${esc(p.extra)}</p>`;go(4);for(let i=0;i<35;i++){let c=document.createElement("span");c.className="confetti";c.textContent=["💗","✨","💕","🌸"][i%4];c.style.left=Math.random()*100+"vw";c.style.animationDelay=Math.random()+ "s";document.body.appendChild(c);setTimeout(()=>c.remove(),4000)}}
+function showSummary(){let p=getPlan();$("summary").innerHTML=`<p>💌 <b>Para:</b> ${esc(p.person)}</p><p>📅 <b>Fecha:</b> ${esc(p.date)}</p><p>🕒 <b>Hora:</b> ${esc(p.time)}</p><p>📍 <b>Lugar:</b> ${esc(p.place)}</p><p>🍕 <b>Comida:</b> ${esc(p.food)}</p><p>✨ <b>Plan extra:</b> ${esc(p.extra)}</p>`;go(4);for(let i=0;i<35;i++){let c=document.createElement("span");c.className="confetti";c.textContent=["💗","✨","💕","🌸"][i%4];c.style.left=Math.random()*100+"vw";c.style.animationDelay=Math.random()+"s";document.body.appendChild(c);setTimeout(()=>c.remove(),4000)}}
 function planText(){let p=getPlan();return `💌 ¡Tenemos una cita! 💞\nPara: ${p.person}\n📅 Fecha: ${p.date}\n🕒 Hora: ${p.time}\n📍 Lugar: ${p.place}\n🍕 Comida: ${p.food}\n✨ Plan extra: ${p.extra}\n\nHecho con cariño 💗`}
 async function sharePlan(){try{if(navigator.share)await navigator.share({title:"Nuestra cita 💗",text:planText()});else{await navigator.clipboard.writeText(planText());$("status").textContent="¡Copiado! Pégalo en tu chat favorito. 💗"}}catch(e){$("status").textContent="No se pudo compartir automáticamente. Puedes guardar el archivo."}}
 function downloadPlan(){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([planText()],{type:"text/plain;charset=utf-8"}));a.download="nuestra-cita.txt";a.click();URL.revokeObjectURL(a.href);$("status").textContent="Revisa tu carpeta de descargas. 💗"}
-function restart(){food="";["person","date","place","extra"].forEach(id=>$(id).value="");$("time").value="17:00";$("noMessage").textContent="";$("status").textContent="";document.querySelectorAll(".choice").forEach(b=>b.classList.remove("selected"));go(1)}
-</script>
-</body></html>
+function restart(){food="";["person","date","place","extra"].forEach(id=>$(id).value="");$("time").value="17:00";$("noMessage").textContent="";$("status").textContent="";document.querySelectorAll(".choice").forEach(b=>b.classList.remove("selected"));$("letterWrap").classList.remove("open");go(1)}
+</script></body></html>
